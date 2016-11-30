@@ -1,0 +1,6 @@
+#!/bin/bash
+while read hostname; do
+    echo ${hostname}
+    scp ~/.ssh/id_rsa student@${hostname}:.ssh/id_rsa
+    scp ~/.ssh/config student@${hostname}:.ssh/config
+done <goodHosts

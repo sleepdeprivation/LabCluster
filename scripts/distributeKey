@@ -1,0 +1,5 @@
+#!/bin/bash
+while read hostname; do
+    echo ${hostname}
+    ssh-copy-id student@${hostname}
+done <hosts

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+USERNAME=student
+MYIPADDRESS='xxx.xxx.xxx.xxx'
+count=0
+while read hostname ; do
+    >&2 echo 'loading process '$count;
+    #extract the code and execute payload on arrival
+    SCRIPT='mkdir ./script'$count'; tar -xvzf cburke'$count'.tgz -C script'$count'; ./script'$count'/codeBase/payload '$count'; scp ./script'$count'/codeBase/magicFile'$count'.mat student@'$MYIPADDRESS':returnFiles/'$hostname'file'$count'.mat'
+    #so we know what we're up to
+    >&2 echo $SCRIPT;
+    #copy templated files with correct index
+    cp ./runnerFiles/${count} ./codeBase/twoPlusTwo.m
+    ./packItUp > ./logs/tar${count} 2>&1;
+    scp cburke.tgz student@${hostname}:cburke${count}.tgz
+    #ssh and execute script
+    nohup `ssh -n -o BatchMode=yes student@${hostname} "${SCRIPT}"  > ./logs/${count} 2>&1 &`
+    count=`expr $count + 1`
+done<hosts
+#something about dangling pointers
+>&2 echo 'all done, waiting for termination';
+while [ $count -gt 0 ]; do
+    wait $pids
+    count=`expr $count - 1`
+done

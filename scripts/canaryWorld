@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#!/bin/bash
+USERNAME=student
+count=0
+MYIPADDRESS=127.0.0.1
+while read hostname ; do
+    SCRIPT='touch canary; scp ./canary student@'$MYIPADDRESS':returnFiles/canary'$hostname
+    >&2 echo $SCRIPT;
+    ssh -n -o BatchMode=yes student@${hostname} "${SCRIPT}" &
+    count=`expr $count + 1`
+done<hosts
+
+>&2 echo "all started, waiting for termination";
+
+while [ $count -gt 0 ]; do
+    wait $pids
+    count=`expr $count - 1`
+done
